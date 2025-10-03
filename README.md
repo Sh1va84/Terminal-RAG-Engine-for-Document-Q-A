@@ -4,8 +4,7 @@ Meet DSA-GPT, a powerful, conversational AI chatbot that lives in your terminal.
 
 Ask complex questions, get instant, context-aware answers, and never get lost in a textbook again.
 
-![Demo GIF of the CLI in action](https://i.imgur.com/QAs8oCX.gif)
-*(Image: A simulated demonstration of the chatbot in a terminal.)*
+
 
 ---
 
