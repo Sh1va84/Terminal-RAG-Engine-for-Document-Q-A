@@ -1,121 +1,290 @@
-# 🚀 DSA-GPT: Your Personal AI Data Structures & Algorithms Expert 🚀
+# 🚀 DSA RAG Chatbot
 
-Meet DSA-GPT, a powerful, conversational AI chatbot that lives in your terminal. Built with the cutting-edge Google Gemini models and the Pinecone vector database, this tool transforms any Data Structures and Algorithms PDF into your personal, interactive tutor.
+<div align="center">
 
-Ask complex questions, get instant, context-aware answers, and never get lost in a textbook again.
+![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![LangChain](https://img.shields.io/badge/LangChain-1C3C3C?style=for-the-badge&logo=langchain&logoColor=white)
+![Pinecone](https://img.shields.io/badge/Pinecone-000000?style=for-the-badge&logo=pinecone&logoColor=white)
+![Google AI](https://img.shields.io/badge/Google_AI-4285F4?style=for-the-badge&logo=google&logoColor=white)
 
+**An intelligent conversational AI assistant powered by RAG (Retrieval-Augmented Generation) for Data Structures & Algorithms learning**
 
+[Features](#-features) • [Architecture](#-architecture) • [Installation](#-installation) • [Usage](#-usage) • [Configuration](#-configuration)
 
----
-
-## ✨ Core Features
-
-* 🧠 **Conversational Memory:** Don't repeat yourself! The chatbot understands the context of your conversation. You can ask follow-up questions like "What's its time complexity?" and it will know what "it" refers to.
-* 📚 **Retrieval-Augmented Generation (RAG):** Answers are not hallucinated. The bot fetches relevant information directly from your provided `dsa.pdf` document, ensuring responses are accurate and grounded in your source material.
-* 🎯 **Expert Persona:** With a specialized system prompt, the AI behaves like a seasoned DSA expert, providing clear, concise, and educational answers.
-* 🔒 **Fact-Checked Responses:** The bot is strictly instructed to only answer based on the provided document. If the information isn't there, it will tell you, preventing misinformation.
-* 🚀 **Blazing Fast & Efficient:** Utilizes the highly-efficient `gemini-2.0-flash` for generation and `text-embedding-004` for state-of-the-art embeddings, delivering quick and relevant results.
-* 🔌 **Modular & Easy to Use:** A simple two-step process: first, index your document once; then, chat with it forever.
+</div>
 
 ---
 
-## ⚙️ How It Works: The Architecture
+## 📋 Overview
 
-This project uses a powerful RAG (Retrieval-Augmented Generation) pipeline. It's a two-stage process.
+This project implements a sophisticated RAG-based chatbot that serves as your personal Data Structures and Algorithms tutor. It processes PDF documents, creates vector embeddings, stores them in Pinecone vector database, and provides context-aware answers using Google's Gemini AI model.
 
-### Phase 1: Indexing (`index.js`)
+## ✨ Features
 
-This is a one-time setup process that creates the knowledge base for our AI.
+### 🎯 Core Capabilities
 
-1.  **Load:** The `dsa.pdf` file is loaded into the application.
-2.  **Chunk:** The document is broken down into smaller, overlapping text chunks. This allows the AI to find highly specific and relevant pieces of information.
-3.  **Embed:** Each text chunk is converted into a numerical representation (a vector embedding) using Google's `text-embedding-004` model. These embeddings capture the semantic meaning of the text.
-4.  **Store:** The chunks and their corresponding embeddings are uploaded and stored in a [Pinecone](https://www.pinecone.io/) vector index, creating a searchable knowledge library.
+- **📄 PDF Document Processing**: Automatically loads and processes DSA PDF materials
+- **🔪 Intelligent Chunking**: Splits documents into optimal chunks (1000 characters with 200-character overlap) for better retrieval
+- **🧠 Vector Embeddings**: Uses Google's `text-embedding-004` model for high-quality semantic embeddings (768 dimensions)
+- **💾 Vector Database**: Leverages Pinecone for efficient similarity search and storage
+- **🤖 Conversational AI**: Powered by Google's Gemini 2.0 Flash model for fast, accurate responses
+- **💬 Chat History**: Maintains conversation context for natural, multi-turn dialogues
+- **🔄 Query Rewriting**: Intelligently transforms follow-up questions into standalone queries
+- **🎯 Context-Aware Responses**: Retrieves top 10 most relevant documents for each query
+- **🛡️ Hallucination Prevention**: Only answers based on provided context, explicitly states when information isn't available
 
-### Phase 2: Querying & Chatting (`query.js`)
+### 🌟 Advanced Features
 
-This is the interactive loop where the magic happens.
+- **Concurrent Processing**: Handles multiple embedding operations simultaneously (max concurrency: 5)
+- **Smart Retrieval**: Top-K similarity search (K=10) with metadata inclusion
+- **Educational Focus**: Responses are tailored for learning and understanding DSA concepts
+- **Interactive CLI**: Real-time question-answering through command-line interface
 
-![RAG Architecture Diagram](https://i.imgur.com/7pW8Q1k.png)
+## 🏗️ Architecture
 
-1.  **User Question:** You ask a question in the command line (e.g., "What is it?").
-2.  **Query Transformation:** This is the secret sauce for our conversational memory. The AI takes your new question and the previous chat history and rewrites it into a complete, standalone question.
-    * *Your follow-up:* "What is its time complexity?"
-    * *Chat History:* "User: Tell me about Bubble Sort."
-    * *Rewritten Query:* "What is the time complexity of Bubble Sort?"
-3.  **Embed Query:** The new, complete question is converted into a vector embedding.
-4.  **Search:** This query vector is sent to Pinecone, which performs a similarity search and retrieves the top `k` most relevant text chunks from the original PDF.
-5.  **Augment & Generate:** The retrieved chunks (the "context") and the rewritten query are passed to the `gemini-2.0-flash` model with a precise prompt:
-    > "You are a DSA expert. Answer the user's question based *only* on the following context..."
-6.  **Response:** The model generates a human-like answer based on the provided facts and sends it back to you. The conversation is then stored for future context.
+```
+┌─────────────────┐
+│   PDF Document  │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Document Loader │
+│   (LangChain)    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│  Text Splitter   │
+│  (Recursive)     │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Embeddings     │
+│  (Gemini AI)     │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐
+│   Pinecone DB    │
+│  Vector Store    │
+└────────┬────────┘
+         │
+         ▼
+┌─────────────────┐     ┌──────────────┐
+│  Query System    │────▶│  Gemini AI   │
+│  (Similarity     │     │   Response   │
+│   Search)        │     │  Generation  │
+└─────────────────┘     └──────────────┘
+```
+
+## 🛠️ Technology Stack
+
+- **Runtime**: Node.js
+- **LLM Framework**: LangChain
+- **Vector Database**: Pinecone
+- **AI Model**: Google Gemini 2.0 Flash
+- **Embeddings**: Google Generative AI Embeddings (text-embedding-004)
+- **Document Processing**: PDF Loader, Recursive Character Text Splitter
+- **Environment Management**: dotenv
+- **CLI Interface**: readline-sync
+
+## 📦 Installation
+
+### Prerequisites
+
+- Node.js (v16 or higher)
+- npm or yarn
+- Google AI API Key
+- Pinecone API Key and Index
+
+### Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd dsa-rag-chatbot
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Create environment file**
+   ```bash
+   touch .env
+   ```
+
+4. **Configure environment variables**
+   ```env
+   GEMINI_API_KEY=your_google_ai_api_key_here
+   PINECONE_API_KEY=your_pinecone_api_key_here
+   PINECONE_INDEX_NAME=your_index_name_here
+   ```
+
+5. **Add your PDF document**
+   - Place your DSA PDF file in the project root
+   - Name it `dsa.pdf` or update the path in `index.js`
+
+## 🚀 Usage
+
+### Step 1: Index Your Document
+
+Run this once to process and store your PDF in the vector database:
+
+```bash
+node index.js
+```
+
+**Expected Output:**
+```
+step load
+step2
+e
+pine
+stored embedding
+```
+
+### Step 2: Start Chatting
+
+Launch the interactive chatbot:
+
+```bash
+node query.js
+```
+
+**Example Conversation:**
+```
+Ask me anything--> What is a binary search tree?
+
+A binary search tree is a tree data structure where each node has at most 
+two children, and for each node, all values in the left subtree are less 
+than the node's value, and all values in the right subtree are greater...
+
+Ask me anything--> How does it differ from a regular binary tree?
+
+Unlike a regular binary tree, a binary search tree maintains a specific 
+ordering property that enables efficient searching, insertion, and deletion 
+operations with O(log n) time complexity...
+```
+
+## ⚙️ Configuration
+
+### Chunking Parameters
+
+Adjust in `index.js`:
+```javascript
+const textSplitter = new RecursiveCharacterTextSplitter({
+    chunkSize: 1000,      // Size of each chunk
+    chunkOverlap: 200,    // Overlap between chunks
+});
+```
+
+### Retrieval Settings
+
+Modify in `query.js`:
+```javascript
+const searchResults = await pineconeIndex.query({
+    topK: 10,              // Number of documents to retrieve
+    vector: queryVector,
+    includeMetadata: true,
+});
+```
+
+### Model Configuration
+
+Change models in respective files:
+- **Embeddings**: `text-embedding-004` (768 dimensions)
+- **LLM**: `gemini-2.0-flash` (Fast inference, great for chat)
+
+## 📁 Project Structure
+
+```
+dsa-rag-chatbot/
+├── index.js           # Document indexing script
+├── query.js           # Query and chat interface
+├── dsa.pdf            # Your DSA PDF document
+├── .env               # Environment variables (create this)
+├── package.json       # Project dependencies
+└── README.md          # This file
+```
+
+## 🔑 Key Components
+
+### Document Indexing (`index.js`)
+
+- Loads PDF documents using LangChain's PDF loader
+- Splits documents into manageable chunks with overlap
+- Generates vector embeddings using Google's embedding model
+- Stores embeddings in Pinecone with metadata
+
+### Query System (`query.js`)
+
+- **Query Rewriting**: Transforms follow-up questions into standalone queries
+- **Vector Search**: Finds relevant document chunks using similarity search
+- **Context Building**: Aggregates top results into coherent context
+- **Response Generation**: Uses Gemini AI with context to generate answers
+- **Chat History**: Maintains conversation flow for natural interactions
+
+## 🎓 Use Cases
+
+- **DSA Learning**: Get instant answers about data structures and algorithms
+- **Interview Prep**: Practice DSA concepts with an AI tutor
+- **Quick Reference**: Look up specific algorithms or implementations
+- **Concept Clarification**: Ask follow-up questions for deeper understanding
+- **Document Q&A**: Query any DSA PDF document you have
+
+## 🛡️ Best Practices
+
+1. **Document Quality**: Use well-structured PDF documents for best results
+2. **Chunk Size**: Adjust based on your document's content density
+3. **Context Window**: Monitor the size of retrieved context for optimal performance
+4. **Query Clarity**: Ask specific, clear questions for better responses
+5. **Index Updates**: Re-run indexing when updating source documents
+
+## 🐛 Troubleshooting
+
+**Issue**: "Could not find answer in provided document"
+- **Solution**: Question may be outside document scope or document not indexed properly
+
+**Issue**: Slow response times
+- **Solution**: Reduce `topK` value or check Pinecone index performance
+
+**Issue**: Connection errors
+- **Solution**: Verify API keys and network connectivity
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+## 🤝 Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the issues page.
+
+## 💡 Future Enhancements
+
+- [ ] Multi-document support
+- [ ] Web interface using React/Next.js
+- [ ] Export chat history
+- [ ] Support for multiple file formats (DOCX, TXT, MD)
+- [ ] Advanced filtering and metadata queries
+- [ ] Caching layer for frequently asked questions
+- [ ] Analytics dashboard for query insights
+
+## 🙏 Acknowledgments
+
+- LangChain for the amazing RAG framework
+- Google AI for Gemini models
+- Pinecone for vector database infrastructure
 
 ---
 
-## 🛠️ Tech Stack
+<div align="center">
 
-* **Language:** Node.js
-* **LLM & Embeddings:** Google Gemini (`gemini-2.0-flash`, `text-embedding-004`)
-* **Vector Database:** Pinecone
-* **Frameworks/Libraries:** LangChain.js, Google GenAI SDK, Pinecone SDK, `readline-sync`
+**Made with ❤️ for DSA learners**
 
----
+⭐ Star this repo if you find it helpful!
 
-## 🚀 Getting Started
-
-Follow these steps to get your personal DSA expert up and running.
-
-### 1. Prerequisites
-
-* Node.js (v18 or higher)
-* An API key for Google AI Studio (Gemini)
-* A Pinecone account (the free tier is sufficient) and an API key.
-
-### 2. Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/your-username/dsa-gpt.git](https://github.com/your-username/dsa-gpt.git)
-    cd dsa-gpt
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Set up your environment variables:**
-    Create a file named `.env` in the root of the project and add the following, replacing the placeholders with your actual credentials.
-
-    ```env
-    # .env
-    
-    # Get from Google AI Studio -> [https://makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
-    GEMINI_API_KEY="YOUR_GEMINI_API_KEY"
-    
-    # Get from your Pinecone dashboard -> [https://app.pinecone.io/](https://app.pinecone.io/)
-    PINECONE_API_KEY="YOUR_PINECONE_API_KEY"
-    PINECONE_INDEX_NAME="your-pinecone-index-name"
-    ```
-    *Note: Make sure your Pinecone index is created with dimensions matching the embedding model (`768` for `text-embedding-004`).*
-
-4.  **Add your knowledge base:**
-    Place your Data Structures and Algorithms PDF file in the root of the project directory and name it `dsa.pdf`.
-
-### 3. Usage
-
-1.  **Step 1: Index your document**
-    Run this script once to process your PDF and store it in Pinecone. This may take a few minutes depending on the size of your document.
-
-    ```bash
-    node index.js
-    ```
-    You should see console logs indicating the progress: `step load`, `step2`, `e`, `pine`, `stored embedding`.
-
-2.  **Step 2: Start chatting!**
-    Now you're ready to chat. Run the query script to start the interactive session.
-
-    ```bash
-    node query.js
-    ```
-
-    The terminal will prompt you with `Ask me anything-->`. Start your conversation!
+</div>
